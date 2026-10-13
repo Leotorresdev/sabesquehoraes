@@ -2,21 +2,26 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { MessageCircle, Truck } from "lucide-react";
+import { MessageCircle, Truck, Phone } from "lucide-react";
 
 export default function Footer() {
+  const WHATSAPP_PHONE = "584124389835";
+  const DISPLAY_PHONE = "0412-4389835";
+  const TIKTOK_URL = "https://www.tiktok.com/@sabesquehoraes?_r=1&_t=ZS-9AWOqx2M4rH";
+  const INSTAGRAM_URL = "https://www.instagram.com/sabesquehoraes?dlrf=emF0bnJ2aWo3MmFk&utm_source=qr";
+
   const handleWhatsAppAsesoria = () => {
     const text = encodeURIComponent(
       "Hola SabesQueHoraEs, deseo recibir asesoría personalizada para elegir un reloj de su catálogo."
     );
-    window.open(`https://wa.me/584120000000?text=${text}`, "_blank");
+    window.open(`https://wa.me/${WHATSAPP_PHONE}?text=${text}`, "_blank");
   };
 
   const handleWhatsAppEnvios = () => {
     const text = encodeURIComponent(
       "Hola SabesQueHoraEs, deseo consultar la cobertura y métodos de envío nacional para la entrega de mi reloj."
     );
-    window.open(`https://wa.me/584120000000?text=${text}`, "_blank");
+    window.open(`https://wa.me/${WHATSAPP_PHONE}?text=${text}`, "_blank");
   };
 
   return (
@@ -48,6 +53,17 @@ export default function Footer() {
             <p className="text-xs sm:text-sm text-gray-400 font-light leading-relaxed max-w-sm">
               Tu tienda especializada en piezas de relojería de alta presencia y prestigio. Catálogo exclusivo con atención directa y compra garantizada.
             </p>
+
+            {/* Direct Phone Display */}
+            <a
+              href={`https://wa.me/${WHATSAPP_PHONE}`}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-2 text-xs text-[#D4AF37] hover:text-[#FFF1C5] transition-colors font-medium pt-1"
+            >
+              <Phone className="w-3.5 h-3.5" />
+              <span>WhatsApp: {DISPLAY_PHONE}</span>
+            </a>
           </div>
 
           {/* Enlaces Útiles */}
@@ -101,7 +117,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Redes Sociales (Instagram & TikTok) */}
+          {/* Redes Sociales Oficiales (Instagram & TikTok) */}
           <div className="lg:col-span-2 space-y-3">
             <h4 className="text-white font-serif font-bold text-sm tracking-wider uppercase">
               Redes Sociales
@@ -109,10 +125,10 @@ export default function Footer() {
             <div className="flex items-center gap-3 pt-1">
               {/* Instagram */}
               <a
-                href="https://instagram.com"
+                href={INSTAGRAM_URL}
                 target="_blank"
                 rel="noreferrer"
-                aria-label="Instagram de SabesQueHoraEs"
+                aria-label="Instagram oficial de SabesQueHoraEs"
                 className="w-10 h-10 rounded-xl bg-[#090d0b] border border-gray-800 flex items-center justify-center text-gray-300 hover:text-[#D4AF37] hover:border-[#D4AF37]/60 hover:shadow-[0_0_15px_rgba(212,175,55,0.25)] transition-all cursor-pointer"
               >
                 <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
@@ -122,10 +138,10 @@ export default function Footer() {
 
               {/* TikTok */}
               <a
-                href="https://tiktok.com"
+                href={TIKTOK_URL}
                 target="_blank"
                 rel="noreferrer"
-                aria-label="TikTok de SabesQueHoraEs"
+                aria-label="TikTok oficial de SabesQueHoraEs"
                 className="w-10 h-10 rounded-xl bg-[#090d0b] border border-gray-800 flex items-center justify-center text-gray-300 hover:text-[#D4AF37] hover:border-[#D4AF37]/60 hover:shadow-[0_0_15px_rgba(212,175,55,0.25)] transition-all cursor-pointer"
               >
                 <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">

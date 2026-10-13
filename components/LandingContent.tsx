@@ -31,10 +31,15 @@ export default function LandingContent({ initialRelojes }: LandingContentProps) 
   const handleAddToCart = (reloj: Reloj, variant: RelojVariante) => {
     // Direct purchase flow via WhatsApp with pre-filled message
     const price = variant?.precio ? Number(variant.precio).toFixed(2) : "0.00";
-    const message = encodeURIComponent(
-      `Hola SabesQueHoraEs, deseo comprar el reloj *${reloj.modelo}* (Color: *${variant.color}*) por un valor de *$${price} USD*. ¿Tienen disponibilidad para coordinar el pago y envío?`
-    );
-    window.open(`https://wa.me/584120000000?text=${message}`, "_blank");
+    const inStock = (variant?.stock || 0) > 0;
+    const message = inStock
+      ? encodeURIComponent(
+          `Hola SabesQueHoraEs, deseo comprar el reloj *${reloj.modelo}* (Color: *${variant.color}*) por un valor de *$${price} USD*. ¿Tienen disponibilidad para coordinar el pago y envío?`
+        )
+      : encodeURIComponent(
+          `Hola SabesQueHoraEs, veo que el reloj *${reloj.modelo}* (Color: *${variant.color}*) está agotado. ¿Tienen fecha estimada de reposición o disponibilidad de este modelo?`
+        );
+    window.open(`https://wa.me/584124389835?text=${message}`, "_blank");
   };
 
   return (

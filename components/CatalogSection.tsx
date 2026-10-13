@@ -21,7 +21,7 @@ export default function CatalogSection({
   const INITIAL_VISIBLE_COUNT = 6;
   const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE_COUNT);
 
-  // Get active variant for a watch, default to first variant
+  // Get active variant for a watch, default to first in-stock variant or first variant
   const getActiveVariant = (reloj: Reloj): RelojVariante | undefined => {
     if (!reloj.relojes_variantes || reloj.relojes_variantes.length === 0) {
       return undefined;
@@ -31,7 +31,8 @@ export default function CatalogSection({
       const found = reloj.relojes_variantes.find((v) => v.id === selectedVariantId);
       if (found) return found;
     }
-    return reloj.relojes_variantes[0];
+    const inStockVariant = reloj.relojes_variantes.find((v) => (v.stock || 0) > 0);
+    return inStockVariant || reloj.relojes_variantes[0];
   };
 
   const handleVariantSelect = (relojId: string, variantId: string) => {
@@ -85,6 +86,7 @@ export default function CatalogSection({
               const activeVariant = getActiveVariant(reloj);
               const price = activeVariant?.precio ? Number(activeVariant.precio).toFixed(2) : "0.00";
               const imageUrl = activeVariant?.foto_url || "/sample-watch.jpg";
+              const isOutOfStock = (activeVariant?.stock || 0) <= 0;
 
               return (
                 <div
@@ -96,6 +98,16 @@ export default function CatalogSection({
                     onClick={() => activeVariant && onSelectReloj(reloj, activeVariant)}
                     className="relative w-full aspect-[4/5] rounded-xl sm:rounded-2xl overflow-hidden bg-gradient-to-b from-[#131c16] via-[#090d0b] to-[#030504] border border-[#D4AF37]/20 group-hover:border-[#D4AF37]/50 transition-all duration-500 p-2 sm:p-4 flex items-center justify-center cursor-pointer mb-2 sm:mb-4"
                   >
+                    {/* Out of stock badge */}
+                    {isOutOfStock && (
+                      <div className="absolute top-2 left-2 z-20 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full bg-red-950/85 border border-red-500/60 backdrop-blur-md flex items-center gap-1.5 shadow-lg">
+                        <span className="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse" />
+                        <span className="text-[9px] sm:text-[11px] font-bold text-red-200 uppercase tracking-wider">
+                          Agotado
+                        </span>
+                      </div>
+                    )}
+
                     {/* Subtle Radial Glow Behind Watch */}
                     <div className="absolute inset-0 bg-radial-gradient from-[#0c3b2c]/20 via-transparent to-transparent opacity-80 pointer-events-none" />
 
@@ -105,7 +117,9 @@ export default function CatalogSection({
                         alt={reloj.modelo}
                         fill
                         sizes="(max-width: 640px) 50vw, (max-width: 1024px) 50vw, 33vw"
-                        className="object-contain drop-shadow-[0_15px_25px_rgba(0,0,0,0.95)] group-hover:scale-105 transition-transform duration-700 ease-out"
+                        className={`object-contain drop-shadow-[0_15px_25px_rgba(0,0,0,0.95)] group-hover:scale-105 transition-transform duration-700 ease-out ${
+                          isOutOfStock ? "grayscale-[35%] opacity-85" : ""
+                        }`}
                       />
                     </div>
 
@@ -119,19 +133,33 @@ export default function CatalogSection({
                       <span className="text-[8px] sm:text-[10px] text-gray-400 uppercase tracking-wider font-semibold shrink-0">
                         Color:
                       </span>
-                      {reloj.relojes_variantes.map((v) => (
-                        <button
-                          key={v.id}
-                          onClick={() => handleVariantSelect(reloj.id, v.id)}
-                          className={`text-[9px] sm:text-[11px] px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-md sm:rounded-lg border transition-all cursor-pointer shrink-0 ${
-                            activeVariant?.id === v.id
-                              ? "border-[#D4AF37] bg-[#D4AF37]/25 text-[#FFF1C5] font-semibold shadow-sm"
-                              : "border-gray-800/90 bg-black/60 text-gray-400 hover:border-gray-700"
-                          }`}
-                        >
-                          {v.color}
-                        </button>
-                      ))}
+                      {reloj.relojes_variantes.map((v) => {
+                        const variantOut = (v.stock || 0) <= 0;
+                        const isSelected = activeVariant?.id === v.id;
+                        return (
+                          <button
+                            key={v.id}
+                            onClick={() => handleVariantSelect(reloj.id, v.id)}
+                            className={`text-[9px] sm:text-[11px] px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-md sm:rounded-lg border transition-all cursor-pointer shrink-0 flex items-center gap-1 ${
+                              isSelected
+                                ? variantOut
+                                  ? "border-red-500/80 bg-red-950/50 text-red-200 font-semibold shadow-sm"
+                                  : "border-[#D4AF37] bg-[#D4AF37]/25 text-[#FFF1C5] font-semibold shadow-sm"
+                                : variantOut
+                                ? "border-gray-800/80 bg-black/60 text-gray-500 hover:border-gray-700"
+                                : "border-gray-800/90 bg-black/60 text-gray-400 hover:border-gray-700"
+                            }`}
+                            title={variantOut ? `${v.color} (Agotado)` : v.color}
+                          >
+                            <span>{v.color}</span>
+                            {variantOut && (
+                              <span className="text-[7px] sm:text-[8px] text-red-400/90 uppercase font-semibold">
+                                (Agotado)
+                              </span>
+                            )}
+                          </button>
+                        );
+                      })}
                     </div>
                   )}
 
@@ -152,14 +180,23 @@ export default function CatalogSection({
                         </p>
                       </div>
 
-                      {/* Buy Now Button */}
-                      <button
-                        onClick={() => activeVariant && onSelectReloj(reloj, activeVariant)}
-                        className="w-full sm:w-auto px-2.5 sm:px-5 py-2 sm:py-2.5 rounded-lg sm:rounded-xl bg-gradient-to-r from-[#D4AF37] to-[#B89223] text-black text-[10px] sm:text-xs font-bold uppercase tracking-wider hover:brightness-110 active:scale-95 transition-all shadow-md shadow-[#D4AF37]/20 flex items-center justify-center gap-1 cursor-pointer"
-                      >
-                        <ShoppingBag className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-                        <span>Comprar</span>
-                      </button>
+                      {/* Buy / Sold Out Button */}
+                      {isOutOfStock ? (
+                        <button
+                          onClick={() => activeVariant && onSelectReloj(reloj, activeVariant)}
+                          className="w-full sm:w-auto px-2 sm:px-4 py-2 sm:py-2.5 rounded-lg sm:rounded-xl bg-red-950/40 border border-red-800/60 text-red-300 hover:bg-red-900/50 text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-1 cursor-pointer"
+                        >
+                          <span>Agotado</span>
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => activeVariant && onSelectReloj(reloj, activeVariant)}
+                          className="w-full sm:w-auto px-2.5 sm:px-5 py-2 sm:py-2.5 rounded-lg sm:rounded-xl bg-gradient-to-r from-[#D4AF37] to-[#B89223] text-black text-[10px] sm:text-xs font-bold uppercase tracking-wider hover:brightness-110 active:scale-95 transition-all shadow-md shadow-[#D4AF37]/20 flex items-center justify-center gap-1 cursor-pointer"
+                        >
+                          <ShoppingBag className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                          <span>Comprar</span>
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>
