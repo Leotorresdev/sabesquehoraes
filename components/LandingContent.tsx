@@ -60,12 +60,14 @@ export default function LandingContent({ initialRelojes }: LandingContentProps) 
       </main>
 
       {/* Quick Buy Modal for selected watch */}
-      <QuickViewModal
-        reloj={selectedReloj}
-        initialVariant={selectedVariant}
-        onClose={handleCloseQuickView}
-        onAddToCart={handleAddToCart}
-      />
+      {selectedReloj && (
+        <QuickViewModal
+          key={selectedReloj.id}
+          reloj={selectedReloj}
+          initialVariant={selectedVariant}
+          onClose={handleCloseQuickView}
+        />
+      )}
 
       {/* Footer */}
       <Footer />
